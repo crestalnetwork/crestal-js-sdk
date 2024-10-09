@@ -1,14 +1,20 @@
 {
-    "compilerOptions": {
-      "module": "ESNext",
-      "moduleResolution": "node",
-      "target": "ESNext",
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "baseUrl": "./",
-      "paths": {
-        "*": ["node_modules/*", "typescript-sdk/*"]
-      }
-    }
-  }
-  
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {
+      "*": ["node_modules/*", "typescript-sdk/*"]
+    },
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
+  },
+  "ts-node": {
+    "experimentalSpecifierResolution": "node"
+  },
+  "include": ["./utils/**/*", "./typescript-sdk/**/*", "./scripts/**/*"]
+}
+
