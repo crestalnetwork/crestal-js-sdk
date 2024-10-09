@@ -40,6 +40,10 @@ jobs:
             echo "api_changed=false" >> $GITHUB_ENV
           fi
 
+      - name: Debug Outputs
+        run: |
+          echo "API Changed: ${{ env.api_changed }}"
+
       - name: Generate SDK only if API changed
         if: env.api_changed == 'true'
         run: |
