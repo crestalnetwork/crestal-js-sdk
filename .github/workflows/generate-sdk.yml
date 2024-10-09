@@ -17,7 +17,7 @@ jobs:
 
       - name: Fetch the current `api.yaml` from the docs repo
         run: |
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -L \
+          curl -H "Authorization: token ${{ secrets.AUTOGEN_GITHUB_TOKEN }}" -L \
             https://raw.githubusercontent.com/crestalnetwork/docs/main/mintlify-docs/api-reference/api.yaml \
             -o new_api.yaml
 
