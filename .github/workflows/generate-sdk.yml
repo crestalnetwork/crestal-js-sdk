@@ -2,15 +2,12 @@ name: Update SDK
 
 on:
   workflow_dispatch:  # Allows for manual triggering
-  schedule:
-    - cron: '0 0 * * *'  # Check for updates daily at midnight UTC
   repository_dispatch:
     types: [update-api-file]
 
 jobs:
   update_sdk:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout auth-sdk repository
         uses: actions/checkout@v2
