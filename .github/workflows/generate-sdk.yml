@@ -15,20 +15,30 @@ jobs:
       - name: Checkout auth-sdk repository
         uses: actions/checkout@v2
 
-      - name: Fetch api.yaml from the docs repo
+      - name: Fetch the current `api.yaml` from the docs repo
         run: |
           curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -L \
             https://raw.githubusercontent.com/crestalnetwork/docs/main/mintlify-docs/api-reference/api.yaml \
-            -o api.yaml
+            -o new_api.yaml
 
-      - name: Install OpenAPI Generator CLI
-        run: yarn global add @openapitools/openapi-generator-cli
-
-      - name: Generate TypeScript SDK
+      - name: Check for API changes
+        id: check_changes
         run: |
+          if [ -f "typescript-sdk/api.yaml" ]; then
+            diff typescript-sdk/api.yaml new_api.yaml > /dev/null || echo "API changed!" > api_changed.txt
+          else
+            echo "API changed!" > api_changed.txt
+          fi
+
+      - name: Generate SDK only if API changed
+        if: steps.check_changes.outputs.api_changed == 'true'
+        run: |
+          mv new_api.yaml api.yaml
+          yarn global add @openapitools/openapi-generator-cli
           yarn openapi-generator-cli generate -i api.yaml -g typescript-fetch -o ./typescript-sdk
 
       - name: Commit and push changes
+        if: steps.check_changes.outputs.api_changed == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
