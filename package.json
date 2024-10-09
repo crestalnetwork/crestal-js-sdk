@@ -7,6 +7,7 @@
   "dependencies": {
     "@openapitools/openapi-generator-cli": "^2.14.0",
     "@types/node": "^22.7.5",
+    "dotenv": "^16.4.5",
     "ethers": "^6.13.3",
     "siwe": "^2.3.2",
     "ts-node": "^10.9.2",
