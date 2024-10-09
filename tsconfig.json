@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+      "module": "ESNext",
+      "moduleResolution": "node",
+      "target": "ESNext",
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "baseUrl": "./",
+      "paths": {
+        "*": ["node_modules/*", "typescript-sdk/*"]
+      }
+    }
+  }
+  

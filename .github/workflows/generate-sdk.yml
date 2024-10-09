@@ -1,0 +1,37 @@
+name: Update SDK
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # Check for updates daily at midnight UTC
+  repository_dispatch:
+    types: [update-api-file]
+
+jobs:
+  update_sdk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout auth-sdk repository
+        uses: actions/checkout@v2
+
+      - name: Fetch api.yaml from the docs repo
+        run: |
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -L \
+            https://raw.githubusercontent.com/crestalnetwork/docs/main/mintlify-docs/api-reference/api.yaml \
+            -o api.yaml
+
+      - name: Install OpenAPI Generator CLI
+        run: yarn global add @openapitools/openapi-generator-cli
+
+      - name: Generate TypeScript SDK
+        run: |
+          yarn openapi-generator-cli generate -i api.yaml -g typescript-fetch -o ./typescript-sdk
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add ./typescript-sdk
+          git commit -m "Auto-update SDK based on new API file"
+          git push
