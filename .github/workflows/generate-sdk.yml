@@ -39,14 +39,15 @@ jobs:
       - name: Generate SDK only if API changed
         if: env.api_changed == 'true'
         run: |
-          mv new_api.yaml typescript-sdk/api.yaml
-          npx @openapitools/openapi-generator-cli generate -i typescript-sdk/api.yaml -g typescript-fetch -o ./typescript-sdk
+          mv new_api.yaml api.yaml
+          npx @openapitools/openapi-generator-cli generate -i api.yaml -g typescript-fetch -o ./typescript-sdk
 
       - name: Commit and push changes
         if: env.api_changed == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add typescript-sdk/api.yaml typescript-sdk/ api_changed.txt
+          git add api.yaml typescript-sdk/ api_changed.txt
           git commit -m "Auto-update SDK based on new API file"
-          git push origin main
+          git push
+
