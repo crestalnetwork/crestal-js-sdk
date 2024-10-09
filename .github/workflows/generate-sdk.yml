@@ -1,18 +1,18 @@
 name: Update SDK
 
 on:
-  workflow_dispatch:  # Allows for manual triggering
   repository_dispatch:
-    types: [update-api-file]
+    types: [update-api-file]  # Triggered by the webhook
 
 jobs:
   update_sdk:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout auth-sdk repository
         uses: actions/checkout@v2
 
-      - name: Fetch the current `api.yaml` from the docs repo
+      - name: Fetch the latest `api.yaml` from the docs repo
         run: |
           curl -H "Authorization: token ${{ secrets.AUTOGEN_GITHUB_TOKEN }}" -L \
             https://raw.githubusercontent.com/crestalnetwork/docs/main/mintlify-docs/api-reference/api.yaml \
@@ -26,7 +26,6 @@ jobs:
           else
             echo "true" > api_changed.txt
           fi
-        continue-on-error: true
 
       - name: Set API changed output
         id: api_changed
@@ -36,10 +35,6 @@ jobs:
           else
             echo "api_changed=false" >> $GITHUB_ENV
           fi
-
-      - name: Debug Outputs
-        run: |
-          echo "API Changed: ${{ env.api_changed }}"
 
       - name: Generate SDK only if API changed
         if: env.api_changed == 'true'
