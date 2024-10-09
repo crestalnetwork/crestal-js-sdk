@@ -25,31 +25,23 @@ jobs:
         id: check_changes
         run: |
           if [ -f "typescript-sdk/api.yaml" ]; then
-            if diff typescript-sdk/api.yaml new_api.yaml > /dev/null; then
-              echo "api_changed=false" >> $GITHUB_ENV
-            else
-              echo "api_changed=true" >> $GITHUB_ENV
-            fi
+            diff typescript-sdk/api.yaml new_api.yaml > /dev/null || echo "api_changed=true" >> $GITHUB_ENV
           else
             echo "api_changed=true" >> $GITHUB_ENV
-        continue-on-error: true
-
-      - name: Display API Change Status
-        run: echo "API Changed: ${{ env.api_changed }}"
+          fi
 
       - name: Generate SDK only if API changed
-        if: env.api_changed == 'true'
+        if: ${{ env.api_changed == 'true' }}
         run: |
-          echo "API has changed. Generating new SDK..."
           mv new_api.yaml api.yaml
           yarn global add @openapitools/openapi-generator-cli
           yarn openapi-generator-cli generate -i api.yaml -g typescript-fetch -o ./typescript-sdk
 
       - name: Commit and push changes
-        if: env.api_changed == 'true'
+        if: ${{ env.api_changed == 'true' }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add ./typescript-sdk api.yaml
+          git add ./typescript-sdk
           git commit -m "Auto-update SDK based on new API file"
           git push
