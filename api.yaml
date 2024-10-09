@@ -20,7 +20,7 @@ paths:
   /nonce:
     get:
       summary: Retrieve nonce for authentication
-      description: Provides a nonce for authentication purposes.
+      description: Provides a nonce for authentication purposes..
       operationId: GetNonce
       parameters:
         - name: user_address
@@ -114,7 +114,7 @@ paths:
       parameters:
         - name: user_address
           in: query
-          description: User's blockchain address in hexadecimal format.
+          description: User's blockchain address in hexadecimal format.....
           schema:
             type: string
             minLength: 3

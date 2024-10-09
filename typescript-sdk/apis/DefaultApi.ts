@@ -906,7 +906,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Provides a nonce for authentication purposes
+     * Provides a nonce for authentication purposes..
      * Retrieve nonce for authentication
      */
     async getNonceRaw(requestParameters: GetNonceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetNonce200Response>> {
@@ -936,7 +936,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Provides a nonce for authentication purposes
+     * Provides a nonce for authentication purposes..
      * Retrieve nonce for authentication
      */
     async getNonce(requestParameters: GetNonceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetNonce200Response> {
