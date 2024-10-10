@@ -96,7 +96,7 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@^2.14.0":
+"@openapitools/openapi-generator-cli@2.14.0":
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.14.0.tgz#016f509e7b13325524039d10d428c793503a4a04"
   integrity sha512-k+ioQLtXLXgNbhQbp1UOxtaUnnYTWwAPev88hP5qauFA+eq4NyeQGNojknFssXg2x0VT0TUGmU3PZ2DiQ70IVg==
