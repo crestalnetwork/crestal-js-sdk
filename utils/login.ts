@@ -4,28 +4,30 @@ import { createApiClient } from './apiClient';
 import { createSiweMessage } from './generateSIWE';
 import { signMessageWithPrivateKey } from './signMessage';
 import { logErrorDetails } from './error';
-import { validateEnvVars } from './validateEnvVars'; 
-import { config } from 'dotenv';
+import { validateEnvVars } from './validateEnvVars';
 import { isAddress } from 'ethers';
 
-// Load environment variables from .env file
-config();
+/**
+ * Login function to authenticate using SIWE.
+ * @param {string} privateKey - User's private key to sign the SIWE message.
+ * @param {string} userAddress - Ethereum address of the user.
+ * @param {number} chainId - Blockchain network chain ID.
+ */
+export const login = async (privateKey: string, userAddress: string, chainId: number): Promise<void> => {
 
-async function testLogin() {
-  if (!validateEnvVars()) return; 
-
-  const privateKey = process.env.PRIVATE_KEY as string;
-  const userAddress = process.env.USER_ADDRESS as string;
-  const chainId = parseInt(process.env.CHAIN_ID as string); 
-  
+  // Validate Ethereum address
   if (!isAddress(userAddress)) {
     console.error(`Invalid Ethereum address: ${userAddress}.`);
     return;
   }
+
+  // Validate chain ID
   if (isNaN(chainId)) {
-    console.error('Invalid CHAIN_ID in environment variables.');
+    console.error('Invalid CHAIN_ID.');
     return;
   }
+
+  // Check if chain is supported
   if (!isChainSupported(chainId)) {
     console.error(`Unsupported chain ID: ${chainId}. SIWE message generation is not allowed.`);
     return;
@@ -65,6 +67,4 @@ async function testLogin() {
   } catch (err) {
     logErrorDetails(err);
   }
-}
-
-testLogin();
+};

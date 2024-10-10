@@ -1,9 +1,40 @@
 {
-  "name": "auth-sdk",
+  "name": "@crestalnetwork/crestal-js-sdk",
   "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
+  "description": "JavaScript SDK for Crestal Network services.",
+  "main": "./dist/index.js",  
+  "types": "./dist/index.d.ts", 
   "type": "module",
+  "scripts": {
+    "generate-sdk": "openapi-generator-cli generate -i api.yaml -g typescript-fetch -o ./typescript-sdk",
+    "build": "tsc",
+    "prepare": "yarn build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "crestal",
+    "sdk",
+    "javascript",
+    "typescript",
+    "api"
+  ],
+  "author": "Crestal Network",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crestalnetwork/crestal-js-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/crestalnetwork/crestal-js-sdk/issues"
+  },
+  "homepage": "https://github.com/crestalnetwork/crestal-js-sdk#readme",
+  "files": [
+    "dist", 
+    "*.yaml"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@openapitools/openapi-generator-cli": "2.14.0",
     "@types/node": "^22.7.5",
@@ -14,11 +45,7 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.6.3"
   },
-  "scripts": {
-    "generate-sdk": "openapi-generator-cli generate -i api.yaml -g typescript-fetch -o ./typescript-sdk"
-  },
-  "compilerOptions": {
-    "module": "esnext",
-    "moduleResolution": "node"
+  "devDependencies": {
+    "rimraf": "^5.0.0"
   }
 }

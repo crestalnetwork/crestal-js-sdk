@@ -17,4 +17,3 @@
   },
   "include": ["./utils/**/*", "./typescript-sdk/**/*", "./scripts/**/*"]
 }
-
