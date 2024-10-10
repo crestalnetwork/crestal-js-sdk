@@ -36,11 +36,25 @@ jobs:
             echo "api_changed=false" >> $GITHUB_ENV
           fi
 
+      - name: Install dependencies using Yarn
+        if: env.api_changed == 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Install ts-node globally
+        if: env.api_changed == 'true'
+        run: yarn global add ts-node
+
+      - name: Install openapi-generator-cli globally
+        if: env.api_changed == 'true'
+        run: yarn global add @openapitools/openapi-generator-cli
+
       - name: Generate SDK only if API changed
         if: env.api_changed == 'true'
+        env:
+          NODE_OPTIONS: "--experimental-specifier-resolution=node --loader ts-node/esm --no-warnings"
         run: |
           mv new_api.yaml api.yaml
-          npx @openapitools/openapi-generator-cli generate -i api.yaml -g typescript-fetch -o .
+          openapi-generator-cli generate -i api.yaml -g typescript-fetch -o .
 
       - name: Commit and push changes
         if: env.api_changed == 'true'
