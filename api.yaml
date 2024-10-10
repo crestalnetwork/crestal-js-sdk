@@ -1638,7 +1638,7 @@ paths:
           description: Internal Server Error
           content: { }
 servers:
-  - url: https://api.service.testnet.crestal.xyz/v1
+  - url: https://api.service.testnet.cresta
 components:
   securitySchemes:
     bearerAuth:

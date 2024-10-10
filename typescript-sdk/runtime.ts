@@ -13,7 +13,7 @@
  */
 
 
-export const BASE_PATH = "https://api.service.testnet.crestal.xyz/v1".replace(/\/+$/, "");
+export const BASE_PATH = "https://api.service.testnet.cresta".replace(/\/+$/, "");
 
 export interface ConfigurationParameters {
     basePath?: string; // override base path
