@@ -2,7 +2,7 @@ import { SiweMessage } from 'siwe';
 import { getDomainFromBasePath } from './getDomain';
 import { BASE_PATH } from '../typescript-sdk';
 import { validateNonce } from './validateNonce';
-import { isChainSupported } from './supportedChain';
+import { isChainSupported } from './validateChain';
 import { isAddress } from 'ethers';
 
 /**

@@ -1,4 +1,4 @@
-import { isChainSupported } from './supportedChain';
+import { isChainSupported } from './validateChain';
 import { DefaultApi, Configuration, LoginRequest, LoginOperationRequest, BASE_PATH } from '../typescript-sdk';
 import { createApiClient } from './apiClient';
 import { createSiweMessage } from './generateSIWE';
