@@ -114,7 +114,7 @@ paths:
       parameters:
         - name: user_address
           in: query
-          description: User's blockchain address in hexadecimal format.....
+          description: User's blockchain address in hexadecimal format.
           schema:
             type: string
             minLength: 3
