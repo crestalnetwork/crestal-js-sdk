@@ -1,4 +1,4 @@
-# Auth SDK - Local Setup and Usage
+# CrestalJS SDK - Local Setup and Usage
 
 ## Overview
 
