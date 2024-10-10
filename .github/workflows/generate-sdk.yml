@@ -40,21 +40,18 @@ jobs:
         if: env.api_changed == 'true'
         run: yarn install --frozen-lockfile
 
-      - name: Install ts-node globally
-        if: env.api_changed == 'true'
-        run: yarn global add ts-node
-
-      - name: Install openapi-generator-cli globally
-        if: env.api_changed == 'true'
-        run: yarn global add @openapitools/openapi-generator-cli
-
       - name: Generate SDK only if API changed
         if: env.api_changed == 'true'
         env:
           NODE_OPTIONS: "--experimental-specifier-resolution=node --loader ts-node/esm --no-warnings"
         run: |
           mv new_api.yaml api.yaml
-          openapi-generator-cli generate -i api.yaml -g typescript-fetch -o .
+          echo "Generating SDK based on updated API..."
+          npx @openapitools/openapi-generator-cli generate -i api.yaml -g typescript-fetch -o ./typescript-sdk
+
+      - name: Check for SDK changes
+        if: env.api_changed == 'true'
+        run: git diff --quiet ./typescript-sdk || echo "SDK files have changed"
 
       - name: Commit and push changes
         if: env.api_changed == 'true'
