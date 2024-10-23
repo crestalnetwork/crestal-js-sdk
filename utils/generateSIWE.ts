@@ -13,7 +13,7 @@ import { isAddress } from 'ethers';
  * @param chainId - The blockchain network chain ID.
  * @returns The prepared SIWE message string.
  */
-export const createSiweMessage = (userAddress: string, nonce: string, chainId: number): string => {
+export const createSiweMessage = (userAddress: string, nonce: string | undefined, chainId: number): string => {
   // Validate the nonce before using it
   if (!validateNonce(nonce)) {
     throw new Error(`Invalid nonce: ${nonce}`);

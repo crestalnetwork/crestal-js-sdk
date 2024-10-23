@@ -1,0 +1,54 @@
+import type { State } from './State';
+export interface DAInfoResource {
+    senderName?: string;
+    senderAddress?: string;
+    avgCost?: number;
+    blockTime?: number;
+    createdAt?: string;
+    finalityTime?: number;
+    latency?: number;
+    maxThroughput?: number;
+    uptime?: number;
+    totalTransactions?: number;
+    totalBlocks?: number;
+    totalFee?: number;
+    totalFeeUsd?: number;
+    totalStaked?: number;
+    totalStakedUsd?: number;
+    numberOfNodes?: number;
+    throughput?: number;
+    nodeReliability?: number;
+    costPerTransaction?: number;
+    gasPerTransaction?: number;
+    costPerBlock?: number;
+    gasPerBlock?: number;
+    costPerMb?: number;
+    gasPerMb?: number;
+    totalValueLocked?: number;
+    sendBlobLatency?: number;
+    totalDataTransacted?: number;
+    state?: State;
+    geoCoverage?: number;
+    grantsAvailable?: boolean;
+    numberOfProjects?: number;
+    nodeInfo?: object;
+    daName?: string;
+    networkType?: DAInfoResourceNetworkTypeEnum;
+    network?: string;
+    gasToken?: string;
+    explorer?: string;
+    launchDate?: string;
+    consensusAlgorithm?: string;
+    dataAvailabilitySampling?: boolean;
+}
+export declare const DAInfoResourceNetworkTypeEnum: {
+    readonly Mainnet: "Mainnet";
+    readonly Testnet: "Testnet";
+};
+export type DAInfoResourceNetworkTypeEnum = typeof DAInfoResourceNetworkTypeEnum[keyof typeof DAInfoResourceNetworkTypeEnum];
+export declare function instanceOfDAInfoResource(value: object): value is DAInfoResource;
+export declare function DAInfoResourceFromJSON(json: any): DAInfoResource;
+export declare function DAInfoResourceFromJSONTyped(json: any, ignoreDiscriminator: boolean): DAInfoResource;
+export declare function DAInfoResourceToJSON(json: any): DAInfoResource;
+export declare function DAInfoResourceToJSONTyped(value?: DAInfoResource | null, ignoreDiscriminator?: boolean): any;
+//# sourceMappingURL=DAInfoResource.d.ts.map

@@ -3,7 +3,7 @@
  * @param nonce - The nonce to validate.
  * @returns {boolean} - True if the nonce is valid, false otherwise.
  */
-export const validateNonce = (nonce: string): boolean => {
+export const validateNonce = (nonce: string | undefined): boolean => {
     if (typeof nonce !== 'string') {
       console.error(`Invalid nonce type: ${typeof nonce}. Expected a string.`);
       return false;

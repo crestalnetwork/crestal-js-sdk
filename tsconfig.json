@@ -1,19 +1,41 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "target": "ESNext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "baseUrl": "./",
-    "paths": {
-      "*": ["node_modules/*", "typescript-sdk/*"]
-    },
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "./dist/types",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "module": "ESNext",
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "esnext",
+    "outDir": "./dist/temp",
+    "baseUrl": ".",
+    "rootDir": ".",
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "emitDeclarationOnly": true,
+    "preserveSymlinks": true,
+    "paths": {
+      "*": ["*", "typescript-sdk/*", "utils/*"]
+    }
   },
+  "include": [
+    "typescript-sdk/**/*",
+    "utils/**/*"
+  ],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"],
   "ts-node": {
+    "esm": true,
     "experimentalSpecifierResolution": "node"
-  },
-  "include": ["./utils/**/*", "./typescript-sdk/**/*", "./scripts/**/*"]
+  }
 }
