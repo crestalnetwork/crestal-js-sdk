@@ -39,6 +39,7 @@ exports.__esModule = true;
 exports.login = void 0;
 var validateChain_1 = require("./validateChain");
 var apiClient_1 = require("./apiClient");
+var generateSIWE_1 = require("./generateSIWE");
 var signMessage_1 = require("./signMessage");
 var error_1 = require("./error");
 var ethers_1 = require("ethers");
@@ -76,7 +77,7 @@ exports.login = function (privateKey, userAddress, chainId) { return __awaiter(v
             case 2:
                 nonceResponse = _a.sent();
                 nonce = nonceResponse.nonce;
-                siweMsg = "api.service.testnet.crestal.xyz wants you to sign in with your Ethereum account:\n0x1e22A1C3AB5DfbA41d61d546f39b08A43410caC8\n\n{\"project_id\":\"0xfd4016ce66edd3ca2914a598163627d8c77658492c7e6242fa5ac445f9059178\",\"request_id\":\"0xaf4c617c909508cab271e2f8cf14dd407144bc4c78dd5aa458391ff6b29e62b2\",\"target_performance\":0.95,\"solver_address\":\"0x1e22A1C3AB5DfbA41d61d546f39b08A43410caC8\",\"da_proposals\":[\"eyJpZCI6MSwicHJvamVjdF9pZCI6IjB4ZmQ0MDE2Y2U2NmVkZDNjYTI5MTRhNTk4MTYzNjI3ZDhjNzc2NTg0OTJjN2U2MjQyZmE1YWM0NDVmOTA1OTE3OCIsImNoYWluX2lkIjo4MDA4NCwiaW5pdF9jb3N0IjoxMjAsIm1haW50ZW5hbmNlX2Nvc3QiOjEwMCwiYWNjZXB0X2N1cnJlbmNpZXMiOiJVU0RDIiwiZml0IjowLjksInJhbmsiOjEsIndvcmtlcl9hZGRyZXNzIjoiMHhCQjkwMEJiRTFBMjBkQTRkNDc0NjY2Qjc5YTVmYTZDRTEyNjI5NzMzIn0=\",\"eyJpZCI6MSwicHJvamVjdF9pZCI6IjB4ZmQ0MDE2Y2U2NmVkZDNjYTI5MTRhNTk4MTYzNjI3ZDhjNzc2NTg0OTJjN2U2MjQyZmE1YWM0NDVmOTA1OTE3OCIsImNoYWluX2lkIjo4MDA4NCwiaW5pdF9jb3N0IjoxMzAsIm1haW50ZW5hbmNlX2Nvc3QiOjIwLCJhY2NlcHRfY3VycmVuY2llcyI6IlVTREMiLCJmaXQiOjAuOTIsInJhbmsiOjIsIndvcmtlcl9hZGRyZXNzIjoiMHhCQjkwMEJiRTFBMjBkQTRkNDc0NjY2Qjc5YTVmYTZDRTEyNjI5NzMzIn0=\"]}\n\nURI: https://api.service.testnet.crestal.xyz/v1\nVersion: 1\nChain ID: 80084\nNonce: 100000013\nIssued At: 2024-10-28T14:38:40.393Z\nExpiration Time: 2024-10-28T14:48:40.393Z\nResources:\n- 0xaf4c617c909508cab271e2f8cf14dd407144bc4c78dd5aa458391ff6b29e62b2";
+                siweMsg = generateSIWE_1.createSiweMessage(userAddress, nonce, chainId);
                 console.log('SIWE Message:', siweMsg);
                 return [4 /*yield*/, signMessage_1.signMessageWithPrivateKey(siweMsg, privateKey)];
             case 3:

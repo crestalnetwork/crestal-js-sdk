@@ -42,19 +42,7 @@ export const login = async (privateKey: string, userAddress: string, chainId: nu
     const nonce = nonceResponse.nonce;
 
     // Step 3: Use `createSiweMessage` to create a SIWE message
-    const siweMsg = `api.service.testnet.crestal.xyz wants you to sign in with your Ethereum account:
-0x1e22A1C3AB5DfbA41d61d546f39b08A43410caC8
-
-{"project_id":"0xfd4016ce66edd3ca2914a598163627d8c77658492c7e6242fa5ac445f9059178","request_id":"0xaf4c617c909508cab271e2f8cf14dd407144bc4c78dd5aa458391ff6b29e62b2","target_performance":0.95,"solver_address":"0x1e22A1C3AB5DfbA41d61d546f39b08A43410caC8","da_proposals":["eyJpZCI6MSwicHJvamVjdF9pZCI6IjB4ZmQ0MDE2Y2U2NmVkZDNjYTI5MTRhNTk4MTYzNjI3ZDhjNzc2NTg0OTJjN2U2MjQyZmE1YWM0NDVmOTA1OTE3OCIsImNoYWluX2lkIjo4MDA4NCwiaW5pdF9jb3N0IjoxMjAsIm1haW50ZW5hbmNlX2Nvc3QiOjEwMCwiYWNjZXB0X2N1cnJlbmNpZXMiOiJVU0RDIiwiZml0IjowLjksInJhbmsiOjEsIndvcmtlcl9hZGRyZXNzIjoiMHhCQjkwMEJiRTFBMjBkQTRkNDc0NjY2Qjc5YTVmYTZDRTEyNjI5NzMzIn0=","eyJpZCI6MSwicHJvamVjdF9pZCI6IjB4ZmQ0MDE2Y2U2NmVkZDNjYTI5MTRhNTk4MTYzNjI3ZDhjNzc2NTg0OTJjN2U2MjQyZmE1YWM0NDVmOTA1OTE3OCIsImNoYWluX2lkIjo4MDA4NCwiaW5pdF9jb3N0IjoxMzAsIm1haW50ZW5hbmNlX2Nvc3QiOjIwLCJhY2NlcHRfY3VycmVuY2llcyI6IlVTREMiLCJmaXQiOjAuOTIsInJhbmsiOjIsIndvcmtlcl9hZGRyZXNzIjoiMHhCQjkwMEJiRTFBMjBkQTRkNDc0NjY2Qjc5YTVmYTZDRTEyNjI5NzMzIn0="]}
-
-URI: https://api.service.testnet.crestal.xyz/v1
-Version: 1
-Chain ID: 80084
-Nonce: 100000013
-Issued At: 2024-10-28T14:38:40.393Z
-Expiration Time: 2024-10-28T14:48:40.393Z
-Resources:
-- 0xaf4c617c909508cab271e2f8cf14dd407144bc4c78dd5aa458391ff6b29e62b2`;
+    const siweMsg = createSiweMessage(userAddress, nonce, chainId);
     console.log('SIWE Message:', siweMsg);
 
     // Step 4: Sign the SIWE message using `signMessageWithPrivateKey` 
