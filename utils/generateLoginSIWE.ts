@@ -39,3 +39,4 @@ export const createSiweMessage = (userAddress: string, nonce: string | undefined
   });
   return message.prepareMessage();
 };
+

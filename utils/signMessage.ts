@@ -11,3 +11,4 @@ export const signMessageWithPrivateKey = async (message: string, privateKey: str
   const wallet = new ethers.Wallet(privateKey);
   return wallet.signMessage(message);
 };
+
