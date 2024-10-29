@@ -44,78 +44,24 @@ var siwe_1 = require("siwe");
  * @param messageStr - The SIWE message string.
  * @param signature - The hex-encoded signature string.
  * @param expectedAddress - The expected Ethereum address to verify.
- * @returns An error if verification fails, or `null` if successful.
+ * @returns `true` if verification is successful, `false` otherwise.
  */
 function verifySignature(messageStr, signature, expectedAddress) {
     return __awaiter(this, void 0, Promise, function () {
         var message, preparedMessage, recoveredAddress;
         return __generator(this, function (_a) {
             try {
-                message = void 0;
-                try {
-                    message = new siwe_1.SiweMessage(messageStr);
-                    console.log("Successfully parsed SIWE message");
-                }
-                catch (parseError) {
-                    console.error("Failed to parse SIWE message:", parseError);
-                    return [2 /*return*/, parseError instanceof Error ? parseError : new Error("Unknown parsing error")];
-                }
-                preparedMessage = void 0;
-                try {
-                    preparedMessage = message.prepareMessage();
-                    console.log("Prepared Message for Verification:", preparedMessage);
-                }
-                catch (prepError) {
-                    console.error("Failed to prepare message for verification:", prepError);
-                    return [2 /*return*/, prepError instanceof Error ? prepError : new Error("Unknown preparation error")];
-                }
-                console.log("Original Message:", messageStr);
-                console.log("Signature:", signature);
-                recoveredAddress = void 0;
-                try {
-                    recoveredAddress = ethers_1.ethers.verifyMessage(preparedMessage, signature);
-                    console.log("Recovered Address:", recoveredAddress);
-                }
-                catch (verifyError) {
-                    console.error("Verification failed:", verifyError);
-                    return [2 /*return*/, verifyError instanceof Error ? verifyError : new Error("Unknown verification error")];
-                }
-                // Compare the recovered address with the expected address
-                if (recoveredAddress.toLowerCase() !== expectedAddress.toLowerCase()) {
-                    console.error("Address mismatch: Expected", expectedAddress, "but got", recoveredAddress);
-                    return [2 /*return*/, new Error("Address does not match expected address")];
-                }
-                console.log("Verification successful");
-                return [2 /*return*/, null]; // Verification successful
+                message = new siwe_1.SiweMessage(messageStr);
+                preparedMessage = message.prepareMessage();
+                recoveredAddress = ethers_1.ethers.verifyMessage(preparedMessage, signature);
+                // Check if the recovered address matches the expected address
+                return [2 /*return*/, recoveredAddress.toLowerCase() === expectedAddress.toLowerCase()];
             }
-            catch (err) {
-                console.error("Unexpected error during verification:", err);
-                return [2 /*return*/, err instanceof Error ? err : new Error("Unknown error")];
+            catch (error) {
+                console.error("Verification failed:", error instanceof Error ? error.message : error);
+                return [2 /*return*/, false];
             }
             return [2 /*return*/];
         });
     });
 }
-// Usage Example
-(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var messageStr, privateKey, expectedAddress, signature, verificationResult;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                messageStr = "api.service.testnet.crestal.xyz wants you to sign in with your Ethereum account:\n0x1e22A1C3AB5DfbA41d61d546f39b08A43410caC8\n\n{\"project_id\":\"0xfd4016ce66edd3ca2914a598163627d8c77658492c7e6242fa5ac445f9059178\",\"request_id\":\"0xaf4c617c909508cab271e2f8cf14dd407144bc4c78dd5aa458391ff6b29e62b2\",\"target_performance\":0.95,\"solver_address\":\"0x1e22A1C3AB5DfbA41d61d546f39b08A43410caC8\",\"da_proposals\":[\"eyJpZCI6MSwicHJvamVjdF9pZCI6IjB4ZmQ0MDE2Y2U2NmVkZDNjYTI5MTRhNTk4MTYzNjI3ZDhjNzc2NTg0OTJjN2U2MjQyZmE1YWM0NDVmOTA1OTE3OCIsImNoYWluX2lkIjo4MDA4NCwiaW5pdF9jb3N0IjoxMjAsIm1haW50ZW5hbmNlX2Nvc3QiOjEwMCwiYWNjZXB0X2N1cnJlbmNpZXMiOiJVU0RDIiwiZml0IjowLjksInJhbmsiOjEsIndvcmtlcl9hZGRyZXNzIjoiMHhCQjkwMEJiRTFBMjBkQTRkNDc0NjY2Qjc5YTVmYTZDRTEyNjI5NzMzIn0=\",\"eyJpZCI6MSwicHJvamVjdF9pZCI6IjB4ZmQ0MDE2Y2U2NmVkZDNjYTI5MTRhNTk4MTYzNjI3ZDhjNzc2NTg0OTJjN2U2MjQyZmE1YWM0NDVmOTA1OTE3OCIsImNoYWluX2lkIjo4MDA4NCwiaW5pdF9jb3N0IjoxMzAsIm1haW50ZW5hbmNlX2Nvc3QiOjIwLCJhY2NlcHRfY3VycmVuY2llcyI6IlVTREMiLCJmaXQiOjAuOTIsInJhbmsiOjIsIndvcmtlcl9hZGRyZXNzIjoiMHhCQjkwMEJiRTFBMjBkQTRkNDc0NjY2Qjc5YTVmYTZDRTEyNjI5NzMzIn0=\"]}\n\nURI: https://api.service.testnet.crestal.xyz/v1\nVersion: 1\nChain ID: 80084\nNonce: 100000013\nIssued At: 2024-10-28T14:38:40.393Z\nExpiration Time: 2024-10-28T14:48:40.393Z\nResources:\n- 0xaf4c617c909508cab271e2f8cf14dd407144bc4c78dd5aa458391ff6b29e62b2";
-                privateKey = '469f21a9bf88257a595177404d4765a142e4304a8bffa89d93a8fbf15ca1d3a0';
-                expectedAddress = "0x1e22A1C3AB5DfbA41d61d546f39b08A43410caC8";
-                signature = "0x4002b794b220d01bf275bfb0ffee6e2fe4c625e9ebbc96d4670016cf814474272d96e1eab8620cf2a073304cb87e03d109d6904d6a37f4de5f5e3270da9763301c";
-                return [4 /*yield*/, verifySignature(messageStr, signature, expectedAddress)];
-            case 1:
-                verificationResult = _a.sent();
-                if (verificationResult) {
-                    console.error("Verification failed:", verificationResult.message);
-                }
-                else {
-                    console.log("Verification successful");
-                }
-                return [2 /*return*/];
-        }
-    });
-}); })();

@@ -1,10 +1,9 @@
 import { isChainSupported } from './validateChain';
-import { DefaultApi, Configuration, LoginRequest, LoginOperationRequest, BASE_PATH } from '../typescript-sdk';
+import { LoginRequest, LoginOperationRequest } from '../typescript-sdk';
 import { createApiClient } from './apiClient';
 import { createSiweMessage } from './generateSIWE';
 import { signMessageWithPrivateKey } from './signMessage';
 import { logErrorDetails } from './error';
-import { validateEnvVars } from './validateEnvVars';
 import { isAddress } from 'ethers';
 
 /**

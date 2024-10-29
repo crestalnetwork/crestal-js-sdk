@@ -36,53 +36,42 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.generateProposalSIWE = void 0;
-var siwe_1 = require("siwe");
-var typescript_sdk_1 = require("../typescript-sdk");
+exports.submitProposal = void 0;
 var apiClient_1 = require("./apiClient");
 /**
- * Generates a signed SIWE message for proposals.
- *
- * @param postSolverProposal - The proposal data to serialize and sign.
- * @param solverAddress - The address of the solver submitting the proposal.
- * @param chainId - The chain ID for the proposal transaction.
- * @returns The prepared SIWE message string.
+ * Submits a proposal using the provided SIWE message and signature.
+ * @param {string} solverAddress - Ethereum address of the solver.
+ * @param {string} siweMessage - SIWE message generated for authentication.
+ * @param {string} signature - Signature of the SIWE message.
+ * @returns {Promise<any>} The parsed response data if successful, or an error message if an error occurred.
  */
-function generateProposalSIWE(postSolverProposal, solverAddress, chainId) {
+function submitProposal(solverAddress, siweMessage, signature) {
     return __awaiter(this, void 0, Promise, function () {
-        var api, nonce, domain, issuedAt, expirationTime, siweMessage, error_1;
+        var api, loginRequest, response, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     api = apiClient_1.createApiClient();
+                    loginRequest = {
+                        userAddress: solverAddress,
+                        siweMsg: siweMessage,
+                        signature: signature
+                    };
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, api.getNonce({ userAddress: solverAddress })];
+                    return [4 /*yield*/, api.acceptSolverProposals({ loginRequest: loginRequest })];
                 case 2:
-                    nonce = (_a.sent()).nonce;
-                    domain = new URL(typescript_sdk_1.BASE_PATH).hostname;
-                    issuedAt = new Date().toISOString();
-                    expirationTime = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-                    siweMessage = new siwe_1.SiweMessage({
-                        domain: domain,
-                        address: solverAddress,
-                        uri: typescript_sdk_1.BASE_PATH,
-                        version: '1',
-                        chainId: chainId,
-                        nonce: nonce,
-                        issuedAt: issuedAt,
-                        expirationTime: expirationTime,
-                        statement: JSON.stringify(postSolverProposal)
-                    });
-                    return [2 /*return*/, siweMessage.prepareMessage()];
+                    response = _a.sent();
+                    // Return the parsed response data
+                    return [2 /*return*/, response];
                 case 3:
                     error_1 = _a.sent();
-                    console.error('Failed to generate SIWE message:', error_1);
-                    return [2 /*return*/, undefined];
+                    console.error('Error submitting proposal:', error_1 instanceof Error ? error_1.message : String(error_1));
+                    return [2 /*return*/, { error: error_1 instanceof Error ? error_1.message : String(error_1) }];
                 case 4: return [2 /*return*/];
             }
         });
     });
 }
-exports.generateProposalSIWE = generateProposalSIWE;
+exports.submitProposal = submitProposal;
