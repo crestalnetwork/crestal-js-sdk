@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.verifySignature = void 0;
 var ethers_1 = require("ethers");
 var siwe_1 = require("siwe");
 /**
@@ -65,3 +66,4 @@ function verifySignature(messageStr, signature, expectedAddress) {
         });
     });
 }
+exports.verifySignature = verifySignature;

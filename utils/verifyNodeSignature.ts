@@ -9,7 +9,7 @@ import { SiweMessage } from 'siwe';
  * @param expectedAddress - The expected Ethereum address to verify.
  * @returns `true` if verification is successful, `false` otherwise.
  */
-async function verifySignature(
+export async function verifySignature(
   messageStr: string,
   signature: string,
   expectedAddress: string
