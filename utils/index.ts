@@ -12,5 +12,5 @@ export * from './generateLoginSIWE';
 export * from './polygonAmoyEventListener';
 export * from './submitProposal';
 export * from './verifyNodeSignature';
-export * from './beraEventListener';
+export * from './berachainBartioEventListener';
 export * from './bscTestnetEventListener';
