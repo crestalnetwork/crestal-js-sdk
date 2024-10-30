@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.listenToEvents = void 0;
+exports.amoylistenToEvents = void 0;
 var ethers_1 = require("ethers");
 var blueprintAddress = '0x5D8d432C96DcEE25c9B3B72634B20f11AA5516d7';
 var blueprintAbi = [
@@ -65,7 +65,7 @@ function decodeBase64RecParam(base64RecParam) {
         return null;
     }
 }
-function listenToEvents() {
+function amoylistenToEvents() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             console.log('Listening for RequestProposal events...');
@@ -88,4 +88,4 @@ function listenToEvents() {
         });
     });
 }
-exports.listenToEvents = listenToEvents;
+exports.amoylistenToEvents = amoylistenToEvents;

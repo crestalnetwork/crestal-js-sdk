@@ -34,7 +34,7 @@ function decodeBase64RecParam(base64RecParam: string): ChainRequestParam | null 
   }
 }
 
-export async function listenToEvents() {
+export async function beralistenToEvents() {
   console.log('Listening for RequestProposal events...');
 
   contract.on(
