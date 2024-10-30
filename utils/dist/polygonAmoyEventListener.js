@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.listenToEvents = void 0;
 var ethers_1 = require("ethers");
 var blueprintAddress = '0x5D8d432C96DcEE25c9B3B72634B20f11AA5516d7';
 var blueprintAbi = [
@@ -87,5 +88,4 @@ function listenToEvents() {
         });
     });
 }
-// Start listening to events
-listenToEvents();
+exports.listenToEvents = listenToEvents;

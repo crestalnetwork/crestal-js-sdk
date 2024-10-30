@@ -1,6 +1,6 @@
 {
   "name": "crestal-js-sdk",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "JavaScript SDK for Crestal Network services.",
   "main": "dist/cjs/typescript-sdk/index.js",
   "module": "dist/esm/typescript-sdk/index.js",

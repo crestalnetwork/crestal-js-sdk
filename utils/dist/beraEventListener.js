@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.decodeBase64RecParam = void 0;
+exports.listenToEvents = void 0;
 var ethers_1 = require("ethers");
 var blueprintAddress = '0x5D8d432C96DcEE25c9B3B72634B20f11AA5516d7';
 var blueprintAbi = [
@@ -53,7 +53,7 @@ var blueprintAbi = [
         "type": "event"
     }
 ];
-var provider = new ethers_1.ethers.JsonRpcProvider('https://data-seed-prebsc-1-s1.binance.org:8545/');
+var provider = new ethers_1.ethers.JsonRpcProvider('https://bartio.rpc.berachain.com');
 var contract = new ethers_1.ethers.Contract(blueprintAddress, blueprintAbi, provider);
 function decodeBase64RecParam(base64RecParam) {
     try {
@@ -65,7 +65,6 @@ function decodeBase64RecParam(base64RecParam) {
         return null;
     }
 }
-exports.decodeBase64RecParam = decodeBase64RecParam;
 function listenToEvents() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -89,3 +88,4 @@ function listenToEvents() {
         });
     });
 }
+exports.listenToEvents = listenToEvents;

@@ -24,7 +24,7 @@ interface ChainRequestParam {
   DAProposal?: any; 
 }
 
-function decodeBase64RecParam(base64RecParam: string): ChainRequestParam | null {
+export function decodeBase64RecParam(base64RecParam: string): ChainRequestParam | null {
   try {
     const decoded = Buffer.from(base64RecParam, 'base64').toString('utf-8');
     return JSON.parse(decoded) as ChainRequestParam;
@@ -64,6 +64,3 @@ async function listenToEvents() {
     }
   );
 }
-
-// Start listening to events
-listenToEvents();
