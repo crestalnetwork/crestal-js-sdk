@@ -47,6 +47,18 @@ Add these essential compiler options to your `tsconfig.json`:
 }
 ```
 
+## Build from Source
+
+```bash
+# Clone the SDK
+git clone https://github.com/crestalnetwork/crestal-js-sdk.git
+
+# Install and build
+cd crestal-js-sdk
+npm install # or yarn
+npm run build # or yarn build
+```
+
 ## Usage Examples
 
 ### Generate Login Details
