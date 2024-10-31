@@ -1,0 +1,41 @@
+import type { State } from './State';
+export interface DAInfo {
+    senderName?: string;
+    senderAddress?: string;
+    avgCost?: number;
+    blockTime?: number;
+    createdAt?: string;
+    finalityTime?: number;
+    latency?: number;
+    maxThroughput?: number;
+    uptime?: number;
+    totalTransactions?: number;
+    totalBlocks?: number;
+    totalFee?: number;
+    totalFeeUsd?: number;
+    totalStaked?: number;
+    totalStakedUsd?: number;
+    numberOfNodes?: number;
+    throughput?: number;
+    nodeReliability?: number;
+    costPerTransaction?: number;
+    gasPerTransaction?: number;
+    costPerBlock?: number;
+    gasPerBlock?: number;
+    costPerMb?: number;
+    gasPerMb?: number;
+    totalValueLocked?: number;
+    sendBlobLatency?: number;
+    totalDataTransacted?: number;
+    state?: State;
+    geoCoverage?: number;
+    grantsAvailable?: boolean;
+    numberOfProjects?: number;
+    nodeInfo?: object;
+}
+export declare function instanceOfDAInfo(value: object): value is DAInfo;
+export declare function DAInfoFromJSON(json: any): DAInfo;
+export declare function DAInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): DAInfo;
+export declare function DAInfoToJSON(json: any): DAInfo;
+export declare function DAInfoToJSONTyped(value?: DAInfo | null, ignoreDiscriminator?: boolean): any;
+//# sourceMappingURL=DAInfo.d.ts.map

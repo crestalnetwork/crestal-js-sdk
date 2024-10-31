@@ -1,0 +1,76 @@
+name: Update SDK and Publish to NPM
+
+on:
+  repository_dispatch:
+    types: [update-api-file]
+
+jobs:
+  update_sdk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout auth-sdk repository
+        uses: actions/checkout@v3
+
+      - name: Fetch the latest `api.yaml` from the docs repo
+        run: |
+          curl -H "Authorization: token ${{ secrets.AUTOGEN_GITHUB_TOKEN }}" -L \
+            https://raw.githubusercontent.com/crestalnetwork/docs/main/mintlify-docs/api-reference/api.yaml \
+            -o new_api.yaml
+
+      - name: Check for API changes
+        id: check_changes
+        run: |
+          if [ -f "api.yaml" ]; then
+            if ! diff -q api.yaml new_api.yaml > /dev/null; then
+              echo "true" > api_changed.txt
+            fi
+          else
+            echo "true" > api_changed.txt
+          fi
+
+      - name: Set API changed output
+        id: api_changed
+        run: |
+          if [ -f api_changed.txt ]; then
+            echo "api_changed=true" >> $GITHUB_ENV
+          else
+            echo "api_changed=false" >> $GITHUB_ENV
+          fi
+
+      - name: Install dependencies using Yarn
+        if: env.api_changed == 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Generate SDK only if API changed
+        if: env.api_changed == 'true'
+        env:
+          NODE_OPTIONS: "--experimental-specifier-resolution=node --loader ts-node/esm --no-warnings"
+        run: |
+          mv new_api.yaml api.yaml
+          echo "Generating SDK based on updated API..."
+          npx @openapitools/openapi-generator-cli generate -i api.yaml -g typescript-fetch -o ./typescript-sdk
+
+      - name: Check for SDK changes
+        id: check_sdk_changes
+        if: env.api_changed == 'true'
+        run: |
+          git diff --quiet ./typescript-sdk || echo "sdk_changed=true" >> $GITHUB_ENV
+
+      - name: Commit and push changes
+        if: env.api_changed == 'true' && env.sdk_changed == 'true'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m "Auto-update SDK based on new API file"
+          git push
+
+      - name: Configure NPM for publishing
+        if: env.api_changed == 'true' && env.sdk_changed == 'true'
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Publish to NPM
+        if: env.api_changed == 'true' && env.sdk_changed == 'true'
+        run: npm publish

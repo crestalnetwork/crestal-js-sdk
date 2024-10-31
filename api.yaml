@@ -1,0 +1,2567 @@
+openapi: 3.0.1
+info:
+  title: Crestal dashboard API - /crestal - OpenAPI 3.0
+  description: This is a crestal-dashboard-backend server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: "1.0"
+
+paths:
+  /health_check:
+    get:
+      responses:
+        "200":
+          description: Successful health check.
+          content: {}
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /nonce:
+    get:
+      summary: Retrieve nonce for authentication
+      description: Provides a nonce for authentication purposes..
+      operationId: GetNonce
+      parameters:
+        - name: user_address
+          in: query
+          description: "User's blockchain address."
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response containing nonce details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nonce:
+                    type: string
+                    example: "100000031"
+                    description: A unique nonce, containing at least 9 digits.
+                  user_address:
+                    type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /login:
+    post:
+      summary: Authenticate and obtain session cookie
+      description: Authenticates the user and sets a session cookie.
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          description: Sets a session cookie in the response header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        "400":
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /token:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Refresh authentication token
+      description: Provides a new authentication token for the user.
+      operationId: refreshToken
+      parameters:
+        - name: user_address
+          in: query
+          description: "User's blockchain address."
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returns a new token with an expiration time.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        "400":
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: { }
+  /report:
+    post:
+      security:
+        - bearerAuth: [ ]
+        - ApiKeyAuth: [ ]
+      summary: Submit interaction report
+      description: Submit a report detailing interactions with the dashboard.
+      operationId: interact
+      parameters:
+        - name: user_address
+          in: query
+          description: User's blockchain address in hexadecimal format.
+          schema:
+            type: string
+            minLength: 3
+        - name: type
+          in: query
+          description: Type of report to submit.
+          schema:
+            type: string
+            enum:
+              - interact_with_dashboard
+              - use_deployed_blueprint_proposal
+      responses:
+        "200":
+          description: Report submitted successfully.
+        "400":
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /users/{user_address}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve user information
+      description: Fetches information for a specific user by their blockchain address.
+      operationId: getUserInfo
+      parameters:
+        - in: path
+          name: user_address
+          description: The blockchain address of the user.
+          required: true
+          schema:
+            type: string
+            minLength: 3
+      responses:
+        "200":
+          description: Detailed user information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: { }
+  /scores:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve top user scores
+      description: Retrieves the top scores for a specified number of users.
+      operationId: getScores
+      parameters:
+        - name: top_k
+          in: query
+          description: Number of users with the highest scores to retrieve (default is 10).
+          schema:
+            type: number
+            minLength: 1
+      responses:
+        "200":
+          description: User addresses and their respective scores.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scores'
+        "400":
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+
+  /api_key:
+    get:
+      security:
+        - ApiKeyAuth: [ ]
+      summary: Retrieve an API key
+      description: Provides an API key associated with the specified user address.
+      operationId: APIKey
+      parameters:
+        - name: user_address
+          in: query
+          description: User's blockchain address in hexadecimal format.
+          schema:
+            type: string
+            minLength: 3
+          required: true
+      responses:
+        "200":
+          description: Successfully retrieved the API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIKey'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+    post:
+      summary: Create a new API key
+      description: Generates a new API key for the specified user.
+      operationId: CreateAPIKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          description: Successfully created the API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIKey'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /projects:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve a list of user projects
+      description: Provides detailed information about the projects associated with the user's address.
+      operationId: getProjectStatus
+      parameters:
+        - name: user_address
+          in: query
+          description: User's blockchain address in hexadecimal format.
+          schema:
+            type: string
+            minLength: 3
+        - name: proposal_id
+          in: query
+          description: The unique identifier of the proposal from the solver.
+          schema:
+            type: number
+        - name: deployment_id
+          in: query
+          description: The unique identifier of the deployment from the worker.
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Successfully retrieved the list of project statuses.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: Create new project information
+      description: Creates new project information, primarily used to track user activity in the frontend.
+      operationId: projectPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdate'
+        required: true
+      responses:
+        "200":
+          description: Successfully created the full project information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResource'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /projects/{project_id}/stop:
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: Terminate a project
+      description: Updates the status of the specified project to "terminated."
+      operationId: projectStop
+      parameters:
+        - in: path
+          name: project_id
+          description: The unique identifier of the project.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully updated the project status to "terminated."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResource'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+
+  /projects/{project_id}/cancelled:
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: Cancel a project
+      description: Updates the status of the specified project to "cancelled."
+      operationId: projectCancelled
+      parameters:
+        - in: path
+          name: project_id
+          description: The unique identifier of the project.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully updated the project status to "cancelled."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResource'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /projects/{project_id}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve project information
+      description: Fetches detailed information about the specified project.
+      operationId: getProjectStatusById
+      parameters:
+        - in: path
+          name: project_id
+          description: The unique identifier of the project.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved the project information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResource'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+    patch:
+      security:
+        - bearerAuth: [ ]
+      summary: Update project information
+      description: Updates the details of a specified project, primarily used to track user activity.
+      operationId: projectPatch
+      parameters:
+        - in: path
+          name: project_id
+          description: The unique identifier of the project.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdate'
+        required: true
+      responses:
+        "200":
+          description: Successfully updated the project information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResource'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /deployments/{deployment_id}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve deployment information
+      description: Fetches detailed information about a deployment by its unique identifier.
+      operationId: getDeploymentById
+      parameters:
+        - in: path
+          name: deployment_id
+          description: The unique identifier of the deployment.
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Successfully retrieved deployment information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /deployments:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve deployments based on various parameters
+      description: Provides a list of all deployment information associated with the user's address, proposal ID, or hash.
+      operationId: getDeployments
+      parameters:
+        - name: user_address
+          in: query
+          description: User's blockchain address in hexadecimal format.
+          required: false
+          schema:
+            type: string
+            minLength: 3
+        - name: proposal_id
+          in: query
+          description: The unique identifier of the deployed proposal.
+          required: false
+          schema:
+            type: integer
+        - name: proposal_hash
+          in: query
+          description: SHA256 hash of the deployed proposal.
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved deployment information associated with the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployments'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: Create deployment information
+      description: Creates new deployment information for a specified user or proposal.
+      operationId: DeploymentPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Deployment'
+        required: true
+      responses:
+        "200":
+          description: Successfully created deployment information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+
+  /deployments/worker:
+    get:
+      summary: Retrieve worker deployments by request ID
+      description: Provides deployment information associated with a specific request ID.
+      operationId: getWorkerDeployments
+      parameters:
+        - name: request_id
+          in: query
+          description: Request identifier in hexadecimal format.
+          required: true
+          schema:
+            type: string
+            minLength: 3
+      responses:
+        "200":
+          description: Successfully retrieved deployment information associated with the request ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+    post:
+      summary: Create worker deployment information
+      description: Creates deployment information for a specific worker.
+      operationId: CreateWorkerDeployment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          description: Successfully created deployment information for the worker.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /deployments/worker/status:
+    post:
+      summary: Update worker deployment status
+      description: Updates the status of a specific worker deployment.
+      operationId: UpdateWorkerDeployment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          description: Successfully updated the worker deployment status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /node/info/da:
+    post:
+      summary: Store DA dynamic data
+      description: Stores dynamic data for Data Availability (DA), including latency, average cost, and other metrics.
+      operationId: SetNodeDAInfo
+      requestBody:
+        description: Refer to DAInfoResource for exact data requirements to be included in the SIWE message.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          description: Successfully stored DA dynamic data, including response status, message, and DA information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+
+  /info/da:
+    get:
+      summary: List Data Availability (DA) dynamic data
+      description: Retrieves a list of dynamic data for specified Data Availability (DA) solutions.
+      operationId: ListDAInfo
+      parameters:
+        - name: name
+          in: query
+          description: "The name of the DA solution. If `all`, information for all DA solutions will be listed."
+          required: true
+          schema:
+            type: string
+            enum:
+              - all
+              - EigenDA
+              - NearDA
+              - Celestia
+              - Avail
+              - Ethereum
+              - 0g
+        - name: network_type
+          in: query
+          description: "Specify the network type (e.g., Mainnet or Testnet)."
+          required: true
+          schema:
+            type: string
+            enum:
+              - Mainnet
+              - Testnet
+      responses:
+        "200":
+          description: Successfully retrieved a list of DA dynamic data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListDAInfoResponse'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Specified DA solution not found.
+          content:
+            application/json:
+              schema:
+                type: string
+    post:
+      security:
+        - ApiKeyAuth: [ ]
+      summary: Create DA dynamic data
+      description: Creates dynamic data for a specified Data Availability (DA) solution, including metrics such as latency and average cost.
+      operationId: SetDAInfo
+      requestBody:
+        description: Request body containing DA dynamic data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DAInfoResource'
+        required: true
+      responses:
+        "200":
+          description: Successfully created DA dynamic data, including response status and message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Specified DA solution not found.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+      x-codegen-request-body-name: data
+  /onboarding/da:
+    post:
+      security:
+        - ApiKeyAuth: [ ]
+      summary: Create a new DA entry in the database
+      description: Onboards a new Data Availability (DA) solution, including static information such as consensus algorithm.
+      operationId: CreateDA
+      requestBody:
+        description: Request body containing DA static data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DA'
+        required: true
+      responses:
+        "200":
+          description: Successfully created the full DA information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DA'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /das:
+    get:
+      summary: Retrieve DA static information (temporary endpoint)
+      description: Provides static information about a specific Data Availability (DA) solution. This endpoint is temporary and will be removed later.
+      operationId: GetDAsTemporary
+      parameters:
+        - name: name
+          in: query
+          description: "The name of the DA solution. If `all`, static information for all DA solutions will be listed."
+          required: true
+          schema:
+            type: string
+            enum:
+              - all
+              - EigenDA
+              - NearDA
+              - Celestia
+              - Avail
+              - Ethereum
+              - 0g
+        - name: network_type
+          in: query
+          description: "Specify the network type (e.g., Mainnet or Testnet)."
+          required: false
+          schema:
+            type: string
+            enum:
+              - Mainnet
+              - Testnet
+      responses:
+        "200":
+          description: Successfully retrieved a list of DA static information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DA'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Specified DA solution not found.
+          content:
+            application/json:
+              schema:
+                type: string
+  /info/da/static:
+    get:
+      summary: Retrieve DA static information
+      description: Provides static information for specified Data Availability (DA) solutions.
+      operationId: GetDAs
+      parameters:
+        - name: name
+          in: query
+          description: "The name of the DA solution. If `all`, static information for all DA solutions will be listed."
+          required: true
+          schema:
+            type: string
+            enum:
+              - all
+              - EigenDA
+              - NearDA
+              - Celestia
+              - Avail
+              - Ethereum
+              - 0g
+        - name: network_type
+          in: query
+          description: "Specify the network type (e.g., Mainnet or Testnet)."
+          required: false
+          schema:
+            type: string
+            enum:
+              - Mainnet
+              - Testnet
+      responses:
+        "200":
+          description: Successfully retrieved DA static information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DA'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Specified DA solution not found.
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /info/da/graph:
+    get:
+      summary: Retrieve DA graph information
+      description: Provides a list of graph data for Data Availability (DA) solutions, including metrics such as latency and average cost.
+      operationId: GraphDAInfoEndPoint
+      parameters:
+        - name: from_time
+          in: query
+          description: The start time for the graph in Epoch timestamp (milliseconds).
+          required: true
+          schema:
+            type: number
+            minLength: 3
+        - name: to_time
+          in: query
+          description: The end time for the graph in Epoch timestamp (milliseconds), e.g., 1714194056000.
+          required: true
+          schema:
+            type: number
+            minLength: 3
+        - name: network_type
+          in: query
+          description: Specify the network type (e.g., Mainnet or Testnet).
+          required: true
+          schema:
+            type: string
+            enum:
+              - Mainnet
+              - Testnet
+        - name: da_list
+          in: query
+          description: "A list of DA names in an array, e.g., [NearDA]."
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - EigenDA
+                - NearDA
+                - Celestia
+                - Avail
+                - Ethereum
+                - 0g
+                - all
+      responses:
+        "200":
+          description: Successfully retrieved the list of DA graph information with timestamps for each record.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphDAInfoResponse'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Specified DA solution not found.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /proposals/recommendation:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve recommended proposals from solvers
+      description: Provides a list of proposals recommended by solvers. The list is sorted by default.
+      operationId: GetRecommendProposals
+      parameters:
+        - name: sla
+          in: query
+          description: Uptime requirement in seconds.
+          required: true
+          schema:
+            type: number
+        - name: cost
+          in: query
+          description: Cost in USD.
+          required: true
+          schema:
+            type: number
+        - name: throughput
+          in: query
+          description: Throughput requirement in MB per second.
+          required: true
+          schema:
+            type: number
+        - name: error_rate
+          in: query
+          description: The acceptable error rate.
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Successfully retrieved the list of solver proposals.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SolverProposals'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /proposals/{proposal_id}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve a proposal by ID
+      description: Provides detailed information about a proposal by its unique identifier.
+      operationId: GetProposalByID
+      parameters:
+        - name: proposal_id
+          in: path
+          description: The unique identifier of the proposal.
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Successfully retrieved the full proposal information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Proposal not found.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /proposals/solver:
+    post:
+      summary: Accept a list of proposals from solvers
+      description: Accepts a list of proposals from solvers for processing.
+      operationId: AcceptSolverProposals
+      requestBody:
+        description: The request body containing solver proposal data in the SIWE message.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          description: Successfully accepted solver proposals.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SolversProposals'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve recommended proposals from solvers
+      description: Provides recommended proposals generated by solvers.
+      operationId: GetSolversProposals
+      parameters:
+        - name: request_id
+          in: query
+          description: The unique request ID returned by the solver's smart contract.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved solver proposals information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SolversProposalsResponse'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Proposal not found.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+
+  /proposals:
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: Create a new proposal
+      description: Adds a new proposal to the database.
+      operationId: SetProposal
+      requestBody:
+        description: Request body containing proposal data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Proposal'
+        required: true
+      responses:
+        "200":
+          description: Successfully created the proposal.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Proposal not found.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /workers:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve a list of workers
+      description: Provides a list of all workers.
+      operationId: GetWorkers
+      responses:
+        "200":
+          description: Successfully retrieved worker information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workers'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Workers not found.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /solvers:
+    post:
+      security:
+        - ApiKeyAuth: [ ]
+      summary: Create a solver
+      description: Adds a new solver with provided details.
+      operationId: CreateSolver
+      requestBody:
+        description: Request body containing solver information, such as address.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Solver'
+        required: true
+      responses:
+        "200":
+          description: Successfully created solver information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Solver'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /workers/{worker_uuid}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve worker details by UUID
+      description: Provides information for a worker identified by a UUID.
+      operationId: GetWorkerByUUID
+      parameters:
+        - name: worker_uuid
+          in: path
+          description: Unique identifier (UUID) of the worker.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved worker information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Worker'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Worker not found.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /solvers/{solver_uuid}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve solver details by UUID
+      description: Provides information for a solver identified by a UUID.
+      operationId: GetSolverByUUID
+      parameters:
+        - name: solver_uuid
+          in: path
+          description: Unique identifier (UUID) of the solver.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved solver information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Solver'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Solver not found.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /whitelist:
+    get:
+      security:
+        - ApiKeyAuth: [ ]
+      summary: Retrieve all whitelisted wallet addresses
+      description: Provides a list of all wallet addresses that have been whitelisted.
+      operationId: getWhiteLists
+      responses:
+        "200":
+          description: Successfully retrieved whitelisted wallet addresses.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhiteLists'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+    post:
+      security:
+        - ApiKeyAuth: [ ]
+      summary: Add an address to the whitelist
+      description: Adds a wallet address to the whitelist.
+      operationId: setWhiteList
+      requestBody:
+        description: Request body containing wallet address to be added.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/whiteList'
+        required: true
+      responses:
+        "200":
+          description: Successfully added the wallet address to the whitelist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/whiteList'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /chat:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve chat history
+      description: Retrieves the chat history associated with a specified project.
+      operationId: getChat
+      parameters:
+        - name: project_id
+          in: query
+          description: Project ID for the user.
+          required: true
+          schema:
+            type: string
+            minLength: 3
+      responses:
+        "200":
+          description: Successfully retrieved chat history.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chat'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: Send a chat message
+      description: Sends a chat message to the chat server.
+      operationId: sendChat
+      requestBody:
+        description: Request body containing the chat message.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+        required: true
+      responses:
+        "200":
+          description: Successfully sent the chat message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /quests:
+    get:
+      security:
+        - bearerAuth: [ ]
+        - ApiKeyAuth: [ ]
+      summary: Retrieve all quests
+      description: Provides a list of all quests available to the user.
+      operationId: getQuests
+      responses:
+        "200":
+          description: Successfully retrieved quest information.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quests'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+    post:
+      security:
+        - ApiKeyAuth: [ ]
+      summary: Create a new quest
+      description: Adds a new quest to the system.
+      operationId: createQuests
+      requestBody:
+        description: Request body containing quest data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Quests'
+        required: true
+      responses:
+        "200":
+          description: Successfully created quest information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quests'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+  /user/quests:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve all user quests
+      description: Provides a list of all quests associated with a user.
+      operationId: getUserQuests
+      responses:
+        "200":
+          description: Successfully retrieved user quest information.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserQuest'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+    post:
+      security:
+        - ApiKeyAuth: [ ]
+      summary: Import user completed quests
+      description: Imports completed quests for a specific user.
+      operationId: importUserQuests
+      requestBody:
+        description: Request body containing completed quests.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPostQuests'
+        required: true
+      responses:
+        "200":
+          description: Successfully imported user quest information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Server encountered an internal error.
+          content: {}
+
+  /quests/weekly:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve weekly quests for all users
+      description: Retrieves a list of weekly quests available for all users.
+      operationId: getWeeklyQuests
+      responses:
+        "200":
+          description: Successfully retrieved weekly quests, including completion details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeeklyQuests'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Internal server error.
+          content: {}
+  /quests/{quest_id}:
+    patch:
+      security:
+        - ApiKeyAuth: [ ]
+      summary: Update quest details
+      description: Updates the information of a specific quest.
+      operationId: updateQuests
+      parameters:
+        - name: quest_id
+          in: path
+          description: Unique identifier of the quest to be updated.
+          required: true
+          schema:
+            type: number
+      requestBody:
+        description: Updated quest data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Quests'
+        required: true
+      responses:
+        "200":
+          description: Successfully updated the quest information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quests'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Internal server error.
+          content: {}
+  /referral:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Retrieve user referral information
+      description: Retrieves referral details for the user, including the referral code, creation time, and claim status.
+      operationId: getUserReferral
+      responses:
+        "200":
+          description: Successfully retrieved referral information.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Referral'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Internal server error.
+          content: {}
+  /referral/{code}/claim:
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: Claim a referral code
+      description: Claims a specific referral code.
+      operationId: claimReferCode
+      parameters:
+        - name: code
+          in: path
+          description: Referral code to be claimed.
+          required: true
+          schema:
+            type: string
+        - name: is_claimed
+          in: query
+          description: Specifies whether to claim the referral code.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Successfully claimed the referral code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonResponse'
+        "400":
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: Internal server error.
+          content: {}
+
+  /metadata/metrics:
+    get:
+      summary: Get all metadata metrics
+      tags:
+        - Metadata
+      description: Retrieve an array of all metadata metrics
+      operationId: getAllMetadataMetrics
+      parameters:
+        - name: type
+          in: query
+          description: Filter metrics by type
+          required: false
+          schema:
+            type: string
+            enum:
+              - da
+              - compute
+              - storage
+              - indexing
+            example: da
+      responses:
+        "200":
+          description: A list of metadata metrics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetadataMetric'
+        "500":
+          description: Internal Server Error
+          content: { }
+servers:
+  - url: https://api.service.testnet.crestal.xyz/v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+  schemas:
+    DAInfoResource:
+      allOf:
+        - $ref: '#/components/schemas/HistoryData'
+        - $ref: '#/components/schemas/DASpecificInfo'
+        - $ref: '#/components/schemas/DA'
+    DASpecificInfo:
+      type: object
+      properties:
+        state:
+          $ref: '#/components/schemas/State'
+        geo_coverage:
+          type: number
+        grants_available:
+          type: boolean
+        number_of_projects:
+          type: integer
+        node_info:
+          type: object
+          description: sender node info
+    DA:
+      type: object
+      properties:
+        da_name:
+          type: string
+          description: DA name
+          example: EigenDA
+        network_type:
+          type: string
+          description: network type
+          enum:
+            - Mainnet
+            - Testnet
+        network:
+          type: string
+          description: network name
+        gas_token:
+          type: string
+          description: gas token symbol
+          example: ETH
+        explorer:
+          type: string
+          description: explorer url
+        launch_date:
+          type: string
+          description: "launch date in format xxxx-xx-xx"
+          example: 2024-01-09
+        consensus_algorithm:
+          type: string
+          description: consensus algorithm
+          example: proof of work
+        data_availability_sampling:
+          type: boolean
+    State:
+      type: object
+      properties:
+        data_availability:
+          type: integer
+        exit_windows:
+          type: integer
+        propose_failure:
+          type: integer
+        state_validation:
+          type: integer
+    DAHistoryData:
+      type: object
+      properties:
+        da_name:
+          type: string
+          description: "DA name ex: NearDA"
+          example: NearDA
+        history_data:
+          type: array
+          description: DA graph history data
+          items:
+            $ref: '#/components/schemas/HistoryData'
+    GraphDAInfoResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          description: an array of DA graph history data object
+          items:
+            $ref: '#/components/schemas/DAHistoryData'
+        network_type:
+          type: string
+          description: "network type ex: Mainnet, Testnet"
+          example: Mainnet
+    DAInfo:
+      allOf:
+        - $ref: '#/components/schemas/HistoryData'
+        - $ref: '#/components/schemas/DASpecificInfo'
+    ListDAInfoResponse:
+      type: object
+      properties:
+        da_infos:
+          type: array
+          description: an array of DAInfo object
+          items:
+            $ref: '#/components/schemas/DAInfo'
+        network_type:
+          type: string
+          description: "network type ex: Mainnet, Testnet"
+          example: Mainnet
+    PostResponse:
+      type: object
+      properties:
+        da_info:
+          $ref: '#/components/schemas/DAInfoResource'
+        message:
+          type: string
+        status:
+          type: string
+    HistoryData:
+      type: object
+      properties:
+        sender_name:
+          type: string
+          description: sender identity
+        sender_address:
+          type: string
+          description: sender blockchain address in hex
+        avg_cost:
+          type: number
+          description: "average cost unit: USD"
+          example: 3.2
+        block_time:
+          type: number
+          description: block time in second
+          example: 11.99
+        created_at:
+          type: string
+          description: "no need to set this value, auto created by database"
+          example: 2024-04-26T12:56:41.240582Z
+        finality_time:
+          type: number
+          description: block confirmation time in second
+          example: 24.01
+        latency:
+          type: number
+          description: latency in second
+          example: 0.3
+        max_throughput:
+          type: number
+          description: "max throughput unit: mb/s"
+          example: 10.5
+        uptime:
+          type: number
+          description: The percentage of time the service is available
+          example: 10.0
+        total_transactions:
+          type: integer
+          description: total transactions so far
+        total_blocks:
+          type: integer
+          description: total blocks so far
+        total_fee:
+          type: number
+          description: total gas so far
+        total_fee_usd:
+          type: number
+          description: total gas in usd
+        total_staked:
+          type: number
+          description: total staked so far
+        total_staked_usd:
+          type: number
+          description: total staked in usd
+        number_of_nodes:
+          type: integer
+          description: the number of nodes so far
+        throughput:
+          type: number
+          description: throughput in mb/s
+        node_reliability:
+          type: number
+          description: node reliability
+        cost_per_transaction:
+          type: number
+          description: the gas usd cost per transaction
+        gas_per_transaction:
+          type: number
+          description: the gas per transaction in gas token
+        cost_per_block:
+          type: number
+          description: the gas usd cost per block
+        gas_per_block:
+          type: number
+          description: the gas per block in gas token
+        cost_per_mb:
+          type: number
+          description: the gas usd cost per mb
+        gas_per_mb:
+          type: number
+          description: the gas per mb in gas token
+        total_value_locked:
+          type: number
+        send_blob_latency:
+          type: number
+          description: latency of sending one blob to network
+        total_data_transacted:
+          type: number
+          description: Get from explorer directly
+    SolverProposals:
+      type: object
+      description: Will be deprecated in the future once solver development is complete.
+      properties:
+        solver_proposals:
+          type: array
+          items:
+            $ref: '#/components/schemas/SolverProposal'
+    SolverProposal:
+      type: object
+      description: Will be deprecated in the future once solver development is complete.
+      properties:
+        proposals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Proposal'
+        solver_uuid:
+          type: string
+          description: Unique identifier (UUID) of the solver.
+        solver_reputation:
+          type: number
+          description: Reputation score of the solver.
+    SolversProposalsResponse:
+      type: object
+      properties:
+        proposals:
+          type: array
+          items:
+            $ref: '#/components/schemas/SolversProposal'
+        request_id:
+          type: string
+          description: Unique request ID.
+    SolversProposals:
+      type: object
+      properties:
+        proposals:
+          type: array
+          items:
+            $ref: '#/components/schemas/SolversProposal'
+        solver_address:
+          type: string
+          description: Solver's blockchain address in hexadecimal format.
+        solver_reputation:
+          type: number
+          description: Reputation score of the solver.
+        request_id:
+          type: string
+          description: Unique request ID.
+    SolversProposal:
+      type: object
+      properties:
+        request_id:
+          type: string
+          description: Request ID from the solver smart contract.
+        solver_address:
+          type: string
+          description: Solver's blockchain address in hexadecimal format.
+        solver_reputation:
+          type: number
+          description: Reputation score of the solver.
+        fit:
+          type: number
+          description: Fit score of the solver proposal.
+        rank:
+          type: number
+          description: Rank of the solver proposal.
+        da:
+          $ref: '#/components/schemas/DAProposal'
+        indexing:
+          $ref: '#/components/schemas/IndexingProposal'
+        compute:
+          $ref: '#/components/schemas/ComputeProposal'
+        storage:
+          $ref: '#/components/schemas/StorageProposal'
+    IndexingProposal:
+      type: object
+      properties:
+        rank:
+          type: number
+          description: Rank of the indexing proposal.
+        fit:
+          type: number
+          description: Fit score of the indexing proposal.
+    StorageProposal:
+      type: object
+      properties:
+        rank:
+          type: number
+          description: Rank of the storage proposal.
+        fit:
+          type: number
+          description: Fit score of the storage proposal.
+    ComputeProposal:
+      type: object
+      properties:
+        rank:
+          type: number
+          description: Rank of the compute proposal.
+        fit:
+          type: number
+          description: Fit score of the compute proposal.
+    DAProposal:
+      allOf:
+        - $ref: '#/components/schemas/Proposal'
+    Proposal:
+      type: object
+      properties:
+        init_cost:
+          type: number
+          description: Initial cost to deploy this proposal.
+        maintenance_cost:
+          type: number
+          description: Maintenance cost for this proposal.
+        pay_period:
+          type: number
+          description: Payment period for the proposal.
+        accept_currency:
+          type: string
+          description: Currency accepted for payment.
+        cost:
+          type: number
+          description: Cost in USD.
+          example: 100
+        fit:
+          type: number
+          description: Fit score of the proposal.
+        throughput:
+          type: number
+          description: Throughput in megabytes per second.
+          example: 100
+        sla:
+          type: number
+          description: Uptime in seconds.
+          example: 100
+        error_rate:
+          type: number
+          description: Proposal error rate.
+          example: 0.1
+        rank:
+          type: number
+          description: Rank of the proposal.
+        extra_attribute:
+          type: object
+          description: Additional attributes of the proposal, including setup details.
+    LoginRequest:
+      type: object
+      required:
+        - user_address
+        - signature
+        - siwe_msg
+      properties:
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+        signature:
+          type: string
+          description: User's signature in hexadecimal format.
+        siwe_msg:
+          type: string
+          description: SIWE message in string format.
+    LoginResponse:
+      type: object
+      properties:
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+        access_token:
+          type: string
+          description: Access token used for Bearer authentication in the header.
+        refresh_token:
+          type: string
+          description: Refresh token, with a long expiration time.
+    Projects:
+      type: object
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectResource'
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+    ProjectResource:
+      allOf:
+        - $ref: '#/components/schemas/ProjectUpdate'
+        - $ref: '#/components/schemas/ProjectGetResponse'
+    ProjectGetResponse:
+      type: object
+      properties:
+        proposed_solver:
+          $ref: '#/components/schemas/Solver'
+        deployed_workers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Worker'
+          description: If `workers_uuid` is provided, returns an array of workers; otherwise, returns a single worker.
+    ProjectUpdate:
+      type: object
+      required:
+        - id
+        - user_address
+        - name
+      properties:
+        id:
+          type: string
+          description: Project ID obtained from the blueprint smart contract.
+        proposal_request_id:
+          type: string
+          description: On-chain proposal request ID.
+          example: b8e77eb1ff0f150c35c0fbab7efd5a1db4ad1bef3b00943e58a6fdf63be0e4d6
+        deployment_request_id:
+          type: string
+          description: On-chain deployment request ID.
+          example: b8e77eb1ff0f150c35c0fbab7efd5a1db4ad1bef3b00943e58a6fdf63be0e4d6
+        name:
+          type: string
+          description: Project name.
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+          example: "0x2975b28D83aBE09623e4ceb9522070B8bC10468a"
+        target_performance:
+          type: number
+          description: Target performance obtained from chatbot interaction.
+        pay_amount:
+          type: number
+          description: Pay amount specified in the payment page.
+        status:
+          type: string
+          description: Status of the project.
+          enum:
+            - draft
+            - waiting_proposal
+            - setting_proposal
+            - setting_pay
+            - waiting_deployment
+            - deploying
+            - live
+            - terminated
+        da_name:
+          type: string
+          description: Name of the Data Availability (DA) solution.
+          example: NearDA
+        cost:
+          type: number
+          description: Cost in USD.
+        solver_uuid:
+          type: string
+          description: Unique identifier (UUID) of the solver.
+        proposal_id:
+          type: number
+          description: Proposal ID provided by the solver.
+        workers_uuid:
+          type: string
+          description: List of worker UUIDs separated by commas.
+          example: "worker1,worker2"
+        deployment_id:
+          type: number
+          description: Deployer ID assigned by the worker.
+        pop:
+          type: string
+          description: Point of presence, as specified by the frontend.
+        recommendation_param:
+          type: object
+          description: Parameters for recommendation provided by the smart contract.
+    Deployments:
+      type: object
+      properties:
+        deployments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Deployment'
+        user_address:
+          type: string
+          description: user address  in hex
+    Deployment:
+      type: object
+      required:
+        - user_address
+        - proposal_id
+      properties:
+        id:
+          type: number
+          description: Unique deployment identifier.
+        request_id:
+          type: string
+          description: Hexadecimal request ID from the blockchain.
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+          example: "0x2975b28D83aBE09623e4ceb9522070B8bC10468a"
+        worker_name:
+          type: string
+          description: Name of the worker handling the deployment.
+          example: worker1
+        worker_uuid:
+          type: string
+          description: Unique identifier (UUID) of the worker.
+        proposal_hash:
+          type: string
+          description: SHA-256 hash of the proposal.
+        proposal_id:
+          type: integer
+          description: Unique identifier for the proposal.
+        deployment_details:
+          type: object
+          description: Deployment details in JSON format.
+        proposal:
+          $ref: '#/components/schemas/Proposal'
+        status:
+          type: string
+          description: Deployment status.
+          enum:
+            - init
+            - pick_up
+            - deploying
+            - deployed
+            - generated_proof
+    Solver:
+      type: object
+      properties:
+        address:
+          type: string
+          description: Solver's blockchain address in hexadecimal format.
+        uuid:
+          type: string
+          description: Unique identifier (UUID) of the solver.
+        name:
+          type: string
+          description: Name of the solver.
+        reputation:
+          type: number
+          description: Reputation score of the solver.
+        logo_url:
+          type: string
+          description: URL of the solver's logo.
+        total_staked:
+          type: number
+          description: Total amount staked by the solver.
+    Workers:
+      type: array
+      items:
+        $ref: '#/components/schemas/Worker'
+    Worker:
+      type: object
+      properties:
+        address:
+          type: string
+          description: Worker's blockchain address in hexadecimal format.
+        uuid:
+          type: string
+          description: Unique identifier (UUID) of the worker.
+        name:
+          type: string
+          description: Name of the worker.
+        total_earned:
+          type: number
+          description: Total earnings of the worker.
+        logo_url:
+          type: string
+          description: URL of the worker's logo.
+        total_staked:
+          type: number
+          description: Total amount staked by the worker.
+    APIKey:
+      type: object
+      properties:
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+        api_key:
+          type: string
+          description: Generated API key.
+    WhiteLists:
+      type: array
+      items:
+        $ref: '#/components/schemas/whiteList'
+    whiteList:
+      type: object
+      properties:
+        address:
+          type: string
+          description: Blockchain address on the whitelist.
+        name:
+          type: string
+          description: Data Availability (DA) name.
+          example: EigenDA
+        network_type:
+          type: string
+          description: Type of network.
+          enum:
+            - Mainnet
+            - Testnet
+        created_at:
+          type: string
+          description: Timestamp of creation.
+    Chat:
+      type: object
+      properties:
+        project_id:
+          type: string
+          description: Unique project identifier.
+        message:
+          type: string
+          description: Chat message exchanged between sender and bot.
+        status:
+          type: string
+          description: Status of the chat.
+          example: ONGOING, COMPLETE, CANCEL
+        target_performance:
+          type: object
+          description: JSON object specifying target performance with units.
+        sender:
+          type: string
+          description: Address of the sender in hexadecimal format or "bot".
+          example: bot/0x2975b28D83aBE09623e4ceb9522070B8bC10468a
+        created_at:
+          type: string
+          description: Timestamp of chat creation.
+    ChatRequest:
+      type: object
+      required:
+        - project_id
+        - user_address
+      properties:
+        message:
+          type: string
+          description: Message content for the request.
+        project_id:
+          type: string
+          description: Project identifier.
+          minLength: 3
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+          minLength: 3
+    Address:
+      type: object
+      properties:
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+    Scores:
+      type: array
+      items:
+        $ref: '#/components/schemas/Score'
+    Score:
+      type: object
+      properties:
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+        total_point:
+          type: number
+          description: Total award points received.
+        rank:
+          type: number
+          description: User's rank based on points.
+    Token:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+          description: Newly issued refresh token.
+        access_token:
+          type: string
+          description: Newly issued access token.
+    User:
+      type: object
+      properties:
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+        total_point:
+          type: number
+          description: Total points awarded to the user.
+        quests:
+          type: number
+          description: Total number of completed quests.
+        rank:
+          type: number
+          description: User's ranking based on their achievements.
+        github:
+          type: string
+          description: GitHub profile link of the user.
+        total_invited:
+          type: number
+          description: Total number of users invited by this user.
+        subscribe:
+          type: boolean
+          description: Indicates whether the user is subscribed.
+    MetadataMetric:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the metric.
+        category:
+          type: string
+          enum:
+            - public_info
+            - unverified
+            - verified
+          description: Category of the metadata metric.
+        show_in_chart:
+          type: boolean
+          description: Indicates if this metric should be shown in charts.
+        order_in_chart:
+          type: integer
+          description: Position in chart, where smaller values are closer to the front.
+        show_in_table:
+          type: boolean
+          description: Indicates if this metric should be shown in tables.
+        order_in_table:
+          type: integer
+          description: Position in table, where smaller values are closer to the front.
+        field_name:
+          type: string
+          description: Field name in the API JSON response.
+        display_name:
+          type: string
+          description: Name displayed on the user interface.
+        description:
+          type: string
+          description: Tooltip description displayed when the cursor hovers over the title.
+        unit_in_name:
+          type: string
+          description: Units displayed next to the name for better styling control.
+        unit_in_value:
+          type: string
+          description: Units displayed directly with the value.
+        value_type:
+          type: string
+          enum:
+            - string
+            - int
+            - float
+            - bool
+          description: Data type of the metric value.
+        value_format:
+          type: string
+          description: Format specification for the value.
+        can_sort:
+          type: boolean
+          description: Indicates if the metric can be sorted.
+    Quests:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the quest.
+        category:
+          type: string
+          description: Quest category, such as "builder".
+          example: builder
+        level:
+          type: number
+          description: Difficulty level of the quest.
+          example: 1
+        title:
+          type: string
+          description: Title of the quest.
+        description:
+          type: string
+          description: Description of the quest activity.
+        rocks:
+          type: number
+          description: Total number of "rocks" awarded per quest.
+        activity_action:
+          type: string
+          enum:
+            - login
+            - interact
+            - chat.complete
+            - chat.half
+            - request.proposal
+            - deploy.proposal
+            - deployment.use
+            - feedback
+          description: Activity type associated with the quest.
+    UserQuest:
+      type: object
+      properties:
+        start_time:
+          type: string
+          description: Quest start time in UTC.
+          example: 2024-09-23T00:00:00Z
+        end_time:
+          type: string
+          description: Quest end time in UTC.
+          example: 2024-09-23T00:00:00Z
+        base_rocks:
+          type: number
+          description: Total "rocks" awarded from completing quests.
+        refer_rocks:
+          type: number
+          description: Total "rocks" awarded through referrals.
+    UserPostQuests:
+      type: object
+      properties:
+        user_quests:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPostQuest'
+    UserPostQuest:
+      type: object
+      required:
+        - user_address
+        - quest_activity_action
+        - total_complete
+      properties:
+        user_address:
+          type: string
+          description: User's blockchain address in hexadecimal format.
+        quest_activity_action:
+          type: string
+          enum:
+            - login
+            - interact
+            - chat.complete
+            - chat.half
+            - request.proposal
+            - deploy.proposal
+            - deployment.use
+            - feedback
+          description: Activity type associated with the quest.
+        quest_title:
+          type: string
+          description: Title of the quest.
+        site:
+          type: string
+          description: Site where the activity occurred.
+        chain_id:
+          type: number
+          description: Blockchain network ID.
+        total_complete:
+          type: number
+          description: Number of times the quest activity was completed.
+
+    WeeklyQuests:
+      type: object
+      properties:
+        start_time:
+          type: string
+          description: Start time of the weekly quests in UTC.
+          example: 2024-09-23T00:00:00Z
+        end_time:
+          type: string
+          description: End time of the weekly quests in UTC.
+          example: 2024-09-23T00:00:00Z
+        quests:
+          type: array
+          description: A list of quests available during the week.
+          items:
+            $ref: '#/components/schemas/Quests'
+    Activity:
+      type: object
+      properties:
+        action:
+          type: string
+          description: Activity type performed by the user.
+          example: login, chat
+        address:
+          type: string
+          description: User's blockchain address.
+          example: User's blockchain address in hexadecimal format.
+        created_at:
+          type: string
+          description: Timestamp when the activity was performed.
+          example: 2024-04-26T12:56:41.240582
+    Referral:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the referral.
+        referrer_address:
+          type: string
+          description: Blockchain address of the referrer.
+        referred_address:
+          type: string
+          description: Blockchain address of the referred user.
+        code:
+          type: string
+          description: Referral code used by the referred user.
+        activity_action:
+          type: string
+          description: Action performed as part of the referral.
+          example: login
+        claimed:
+          type: boolean
+          description: Indicates whether the referral was claimed.
+          example: false
+        claimed_at:
+          type: string
+          description: Timestamp when the referral was claimed.
+        active:
+          type: boolean
+          description: Indicates if the referral is currently active.
+        created_at:
+          type: string
+          description: Timestamp when the referral was created.
+    CommonResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Descriptive message providing details about the response.
+        status:
+          type: string
+          description: Status of the response, indicating success or error.
