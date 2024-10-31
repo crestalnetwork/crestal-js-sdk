@@ -18,7 +18,7 @@ async function main() {
         rank: 1,
         type: "public",
         da: {
-          chain_id: 80084,
+          chain_id: chainId,
           da_name: "Avail",
           network_type: "Testnet",
           gas_token: "ETH",

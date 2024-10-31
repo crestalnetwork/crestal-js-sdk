@@ -1,6 +1,6 @@
 # Crestal JavaScript SDK
 
-JavaScript SDK for Crestal's services, supporting Berachain Testnet (80084) and Polygon Amoy (80002).
+JavaScript SDK for Crestal's services.
 
 ## Installation
 
@@ -70,11 +70,11 @@ Then run it with: `npx ts-node --esm YOUR_SCRIPT.ts` or `node YOUR_SCRIPT.js`.
 
 ### Chain Validation
 
+For a full list of supported networks and their chain Ids, please check 
+[here](https://docs.crestal.xyz/networks/supported-networks).
+
 ```typescript
 import { isChainSupported, supportedChainIds } from 'crestal-js-sdk/utils';
-
-// Check supported chains
-console.log('Supported chains:', supportedChainIds); // [80084, 80002]
 
 // Validate a specific chain
 const isValid = isChainSupported(80084); // true

@@ -78,3 +78,7 @@ export type DAName =
   | "Ethereum";
 
 export type NetworkType = "Mainnet" | "Testnet";
+
+export const supportedChainIdsArray = [80002, 80084, 97] as const;
+
+export type SupportedChainIds = typeof supportedChainIdsArray[number];

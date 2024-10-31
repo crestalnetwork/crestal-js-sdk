@@ -67,7 +67,3 @@ export const login = async (privateKey: string, userAddress: string, chainId: nu
     logErrorDetails(err);
   }
 };
-// Usage example
-const privateKey = '469f21a9bf88257a595177404d4765a142e4304a8bffa89d93a8fbf15ca1d3a0';
-const userAddress = '0x1e22A1C3AB5DfbA41d61d546f39b08A43410caC8';
-login(privateKey, userAddress, 80084);
