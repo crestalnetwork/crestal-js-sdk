@@ -82,3 +82,93 @@ export type NetworkType = "Mainnet" | "Testnet";
 export const supportedChainIdsArray = [80002, 80084, 97] as const;
 
 export type SupportedChainIds = typeof supportedChainIdsArray[number];
+
+
+
+
+
+
+
+export type DeployStatus =
+  | 'init'
+  | 'pick_up'
+  | 'deploying'
+  | 'deployed'
+  | 'generating_proof'
+  | 'generated_proof';
+
+  export type DeploymentDetails = {
+    access_url: string;
+    server_https_url: string;
+    server_http_url: string;
+    server_ws_url: string;
+    server_wss_url: string;
+    server_web_socket_url?: string;
+    server_grpc_endpoint?: string;
+    server_rpc_endpoint?: string;
+    token: string;
+  };
+  
+
+export interface Deployment {
+  request_id: string; // Required field, unique ID for the deployment request
+  chain_id: number;
+  project_id?: string; // Optional field, project ID from the Crestal website
+  worker_name?: string; // Optional field, name of the worker
+  worker_address: string; // Required field, worker's Ethereum address in hex format
+  solver_address: string; // Required field, solver's Ethereum address in hex format
+  status: DeployStatus; // Required field, current status of the deployment
+  proposal_hash?: string; // Optional field, hash of the proposal
+  proposal?: object; // Optional field, serialized JSON string of the proposal
+  deployment_details?: DeploymentDetails ; // Optional field, serialized JSON string of the deployment details
+}
+
+
+export interface DeploymentResponse {
+  id: number;
+  request_id: string;
+  user_address: string;
+  worker_name: string;
+  worker_uuid: string;
+  proposal_hash: string;
+  proposal_id: number;
+  deployment_details: DeploymentDetails; 
+  proposal: Proposal;
+  status: "init" | "pick_up" | "deploying" | "deployed" | "generated_proof";
+  updated_at: string; // ISO date string
+  created_at: string; // ISO date string
+}
+
+export type APIInfo = {
+  endpoint: string;
+  method: string;
+  request?: string;
+  response?: string;
+};
+
+export type ServiceInfo = {
+  api_infos: APIInfo[];
+};
+
+export type MachineInfo = {
+  mac_address: string;
+  cloud_provider: string;
+  unique_id: string;
+};
+
+export type ProofOfDeploymentContract = {
+  request_id: string;
+  proposal_base64: string;
+  expiration_date: number;
+  worker_address: string;
+  server_https_url?: string;
+  server_http_url?: string;
+  server_web_socket_url?: string;
+  server_rpc_endpoint?: string;
+  server_grpc_endpoint?: string;
+  deployment_pick_up_time: number;
+  deployment_deployed_time: number;
+  description?: string;
+  machine_info?: MachineInfo;
+  service_info?: ServiceInfo;
+};
