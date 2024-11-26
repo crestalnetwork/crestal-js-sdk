@@ -3,7 +3,7 @@ import { MachineInfo, ProofOfDeploymentContract, ServiceInfo } from "../types";
 
 (async () => {
 
-const privateKey = 'WORKER_ADDRESS_PRIVATE_KEY'; //YOUR_PRIVATE_KEY
+const privateKey = 'WORKER_ADDRESS_PRIVATE_KEY'; 
 const projectId = 'PROJECT_ID'; 
 const requestId = 'REQUEST_ID'; 
 const workerAddress = `WORKER_ADDRESS`; 
